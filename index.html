@@ -15,12 +15,13 @@
         .btn-g2 { background: #4a0e4e; color: #fff; } /* Dark Purple */
         .btn-g3 { background: #ffd700; color: #000; } /* Yellow */
         
-        /* Mobile Scaling Container */
+        /* 📱 FIXED MOBILE WRAPPER BLOCK */
         .map-wrapper {
             width: 100%;
-            display: flex;
-            justify-content: center;
-            padding: 5px 0;
+            overflow-x: visible;
+            display: block; /* Removed flex alignment to prevent left-side clipping */
+            padding: 5px;
+            box-sizing: border-box;
         }
 
         .grid-container { 
@@ -31,13 +32,15 @@
             background: #222; 
             padding: 10px; 
             border-radius: 8px; 
-            transform-origin: top center;
+            transform-origin: top left; /* CHANGED: Anchors to the left edge so it never cuts off */
+            width: 1020px; /* Forces explicit calculation space */
         }
 
         @media (max-width: 1060px) {
             .grid-container {
-                transform: scale(calc(window.innerWidth / 1100));
-                zoom: calc(window.innerWidth / 1100);
+                /* Dynamically recalculates spacing relative to the viewport's left edge */
+                transform: scale(calc((window.innerWidth - 20) / 1050));
+                zoom: calc((window.innerWidth - 20) / 1050);
             }
         }
 
