@@ -70,7 +70,7 @@
         .narrow-col .zone-name { font-size: 9px; line-height: 1.0; }
         .narrow-col .zone-coord, .narrow-col .zone-lvl, .narrow-col .zone-occ { font-size: 8px; }
 
-        /* 📱 TARGETED FIX FOR ROW 5 (Short height, wide width) */
+        /* Row 5 handling (Short height, wide width) */
         .short-row {
             padding: 3px 5px;
             display: flex;
@@ -83,7 +83,6 @@
         .short-row .zone-lvl { font-size: 8px; line-height: 1; display: inline-block; margin-left: 5px; }
         .short-row .zone-occ { font-size: 8px; padding: 1px; margin-top: auto; line-height: 1; height: 11px; display: block; }
         
-        /* Absolute center temple custom blend */
         .short-row.narrow-col {
             padding: 2px;
             justify-content: space-between;
@@ -142,22 +141,15 @@
                 const zoneDiv = document.createElement('div');
                 zoneDiv.className = 'zone guild-none';
                 
-                // Separate row 5 and column 5 formatting targets
-                if (c === 4) {
-                    zoneDiv.classList.add('narrow-col');
-                }
-                if (r === 4) {
-                    zoneDiv.classList.add('short-row');
-                }
-                if (r === 4 && c === 4) {
-                    zoneDiv.classList.add('temple');
-                }
+                if (c === 4) zoneDiv.classList.add('narrow-col');
+                if (r === 4) zoneDiv.classList.add('short-row');
+                if (r === 4 && c === 4) zoneDiv.classList.add('temple');
 
                 const rawText = rawMapData[r][c];
                 const levelIndex = rawText.indexOf("Level");
                 const name = levelIndex > 0 ? rawText.substring(0, levelIndex).replace(/- \$/, '').trim() : rawText.replace(/^Level \d+ /, '');
                 const lvlMatch = rawText.match(/Level \d+/);
-                const lvl = lvlMatch ? lvlMatch : "";
+                const lvl = lvlMatch ? lvlMatch[0] : "";
 
                 zoneDiv.innerHTML = `
                     <div>
@@ -179,3 +171,7 @@
                     if (currentGuild === 'none') {
                         zoneDiv.classList.add('guild-none');
                         occLabel.innerText = "Owner: None";
+                    } else if (currentGuild === 'guild-1') {
+                        zoneDiv.classList.add('guild-1');
+                        occLabel.innerText = "[EVE]";
+                    } else if (currentGuild === 'guild-2') {
