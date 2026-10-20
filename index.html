@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palmon Season 3 Map Divider</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: #fff; padding: 10px; margin: 0; text-align: center; } /* Centers body text like titles globally */
+        body { font-family: sans-serif; background: #121212; color: #fff; padding: 10px; margin: 0; text-align: center; }
         h2 { display: block; width: 100%; text-align: center; color: #ffd700; margin-bottom: 5px; font-size: 20px; }
         .instructions { display: block; width: 100%; text-align: center; color: #aaa; margin-bottom: 15px; font-size: 13px; padding: 0 10px; }
         .controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; width: 100%; }
@@ -15,11 +15,10 @@
         .btn-g2 { background: #4a0e4e; color: #fff; } /* Dark Purple */
         .btn-g3 { background: #ffd700; color: #000; } /* Yellow */
         
-        /* 📱 FIXED MOBILE WRAPPER BLOCK */
         .map-wrapper {
             width: 100%;
             overflow-x: visible;
-            display: block; /* Removed flex alignment to prevent left-side clipping */
+            display: block; 
             padding: 5px;
             box-sizing: border-box;
         }
@@ -32,13 +31,13 @@
             background: #222; 
             padding: 10px; 
             border-radius: 8px; 
-            transform-origin: top left; /* CHANGED: Anchors to the left edge so it never cuts off */
-            width: 1020px; /* Forces explicit calculation space */
+            transform-origin: top left; 
+            width: 1020px;
+            text-align: left;
         }
 
         @media (max-width: 1060px) {
             .grid-container {
-                /* Dynamically recalculates spacing relative to the viewport's left edge */
                 transform: scale(calc((window.innerWidth - 20) / 1050));
                 zoom: calc((window.innerWidth - 20) / 1050);
             }
@@ -56,14 +55,42 @@
             font-size: 11px; 
             transition: all 0.2s; 
             overflow: hidden;
+            box-sizing: border-box;
         }
         .zone:hover { filter: brightness(1.3); border-color: #ffd700; }
         .zone-coord { font-weight: bold; color: #888; font-size: 10px; }
-        .zone-name { color: #fff; font-weight: bold; margin: 4px 0; line-height: 1.2; }
+        .zone-name { color: #fff; font-weight: bold; margin: 2px 0; line-height: 1.1; }
         .zone-lvl { color: #ffd700; font-size: 10px; }
-        .zone-occ { margin-top: auto; font-size: 9px; background: rgba(0,0,0,0.4); padding: 2px; border-radius: 2px; text-align: center; }
+        .zone-occ { margin-top: auto; font-size: 9px; background: rgba(0,0,0,0.4); padding: 2px; border-radius: 2px; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
         
-        /* Guild Custom Color Schemes */
+        /* Column 5 handling (Narrow width, tall height) */
+        .narrow-col {
+            padding: 2px;
+        }
+        .narrow-col .zone-name { font-size: 9px; line-height: 1.0; }
+        .narrow-col .zone-coord, .narrow-col .zone-lvl, .narrow-col .zone-occ { font-size: 8px; }
+
+        /* 📱 TARGETED FIX FOR ROW 5 (Short height, wide width) */
+        .short-row {
+            padding: 3px 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1px;
+        }
+        .short-row .zone-coord { font-size: 8px; line-height: 1; display: inline-block; }
+        .short-row .zone-name { font-size: 9px; line-height: 1; margin: 1px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .short-row .zone-lvl { font-size: 8px; line-height: 1; display: inline-block; margin-left: 5px; }
+        .short-row .zone-occ { font-size: 8px; padding: 1px; margin-top: auto; line-height: 1; height: 11px; display: block; }
+        
+        /* Absolute center temple custom blend */
+        .short-row.narrow-col {
+            padding: 2px;
+            justify-content: space-between;
+        }
+        .short-row.narrow-col .zone-name { white-space: normal; }
+
+        /* Guild Color Overlays */
         .zone.guild-none { border-left: 4px solid #555; }
         .zone.guild-1 { background: #008080 !important; border-color: #00ced1; } /* Teal */
         .zone.guild-2 { background: #4a0e4e !important; border-color: #8a2be2; } /* Dark Purple */
@@ -73,7 +100,7 @@
 </head>
 <body>
 
-    <h2>Palantis Season 3 Server 172 Map divider</h2>
+    <h2>Palantis 9x9 Strategy Map Divider</h2>
     <div class="instructions">Select a guild color below, then click zones on the grid to assign territory.</div>
 
     <div class="controls">
@@ -96,7 +123,6 @@
             event.target.style.outline = '3px solid #fff';
         }
 
-        // Exact raw data provided by user
         const rawMapData = [
             ["Level 1 Desert Ruins", "Level 1 Woodsong Shrine", "Level 1 Desert Ruins", "Level 2 Woodsong Shrine", "Level 1 Desert Ruins", "Level 1 Steelstory Shrine", "Level 1 Desert Ruins", "Level 2 Steelstory Shrine", "Level 1 Desert Ruins"],
             ["Level 2 Steelstory Shrine", "Level 2 Desert Ruins", "Level 3 Woodsong Shrine", "Level 2 Desert Ruins", "Level 3 Steelstory Shrine", "Level 2 Desert Ruins", "Level 3 Goldglade Shrine", "Level 2 Desert Ruins", "Level 1 Goldglade Shrine"],
@@ -116,6 +142,13 @@
                 const zoneDiv = document.createElement('div');
                 zoneDiv.className = 'zone guild-none';
                 
+                // Separate row 5 and column 5 formatting targets
+                if (c === 4) {
+                    zoneDiv.classList.add('narrow-col');
+                }
+                if (r === 4) {
+                    zoneDiv.classList.add('short-row');
+                }
                 if (r === 4 && c === 4) {
                     zoneDiv.classList.add('temple');
                 }
@@ -127,36 +160,22 @@
                 const lvl = lvlMatch ? lvlMatch : "";
 
                 zoneDiv.innerHTML = `
-                    <div class="zone-coord">[R${r+1}, C${c+1}]</div>
+                    <div>
+                        <span class="zone-coord">[R${r+1}, C${c+1}]</span>
+                        <span class="zone-lvl">${lvl}</span>
+                    </div>
                     <div class="zone-name">${name}</div>
-                    <div class="zone-lvl">${lvl}</div>
-                    <div class="zone-occ" id="occ-${r}-${c}">Occupier: None</div>
+                    <div class="zone-occ" id="occ-${r}-${c}">Owner: None</div>
                 `;
 
                 zoneDiv.addEventListener('click', function() {
                     zoneDiv.className = 'zone'; 
+                    if (c === 4) zoneDiv.classList.add('narrow-col');
+                    if (r === 4) zoneDiv.classList.add('short-row');
                     if (r === 4 && c === 4) zoneDiv.classList.add('temple');
                     
                     const occLabel = document.getElementById(`occ-${r}-${c}`);
                     
                     if (currentGuild === 'none') {
                         zoneDiv.classList.add('guild-none');
-                        occLabel.innerText = "Occupier: None";
-                    } else if (currentGuild === 'guild-1') {
-                        zoneDiv.classList.add('guild-1');
-                        occLabel.innerText = "Occupier: Eeveelutions";
-                    } else if (currentGuild === 'guild-2') {
-                        zoneDiv.classList.add('guild-2');
-                        occLabel.innerText = "Occupier: DarkUnicorns";
-                    } else if (currentGuild === 'guild-3') {
-                        zoneDiv.classList.add('guild-3');
-                        occLabel.innerText = "Occupier: NARNIA";
-                    }
-                });
-
-                container.appendChild(zoneDiv);
-            }
-        }
-    </script>
-</body>
-</html>
+                        occLabel.innerText = "Owner: None";
